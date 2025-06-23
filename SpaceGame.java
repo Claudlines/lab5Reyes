@@ -54,12 +54,19 @@ public class SpaceGame extends JFrame implements KeyListener {
     private java.util.List<Obstacle> obstacles;
     private class Obstacle {
         int x, y;
-        int spriteIndex;
+        int frameIndex = 0;
+        int frameDelay = 0;
 
-        Obstacle(int x, int y, int spriteIndex) {
+        Obstacle(int x, int y) {
             this.x = x;
             this.y = y;
-            this.spriteIndex = spriteIndex;
+        }
+        void updateFrame() {
+            frameDelay++;
+            if (frameDelay >= 5) {
+                frameIndex = (frameIndex + 1) % 4;
+                frameDelay = 0;
+            }
         }
     }
 
@@ -214,7 +221,7 @@ public class SpaceGame extends JFrame implements KeyListener {
 
 
         for (Obstacle obstacle : obstacles) {
-            int sx = obstacle.spriteIndex * SPRITE_WIDTH;
+            int sx = obstacle.frameIndex * SPRITE_WIDTH;
             int sy = 0;
             g.drawImage(
                     squidSpriteSheet.getSubimage(sx, sy, SPRITE_WIDTH, SPRITE_HEIGHT),
@@ -282,8 +289,8 @@ public class SpaceGame extends JFrame implements KeyListener {
             // Generate new obstacles
             if (Math.random() < 0.02) {
                 int obstacleX = (int) (Math.random() * (WIDTH - OBSTACLE_WIDTH));
-                int spriteIndex = (int) (Math.random() * 4);
-                obstacles.add(new Obstacle(obstacleX, 0, spriteIndex));
+                int frameIndex = (int) (Math.random() * 4);
+                obstacles.add(new Obstacle(obstacleX, 0));
             }
 
             // Move projectile
@@ -313,6 +320,9 @@ public class SpaceGame extends JFrame implements KeyListener {
                 }
             }
 
+            for (Obstacle obstacle : obstacles) {
+                obstacle.updateFrame();
+            }
 
             // Check collision with obstacle
             Rectangle projectileRect = new Rectangle(projectileX, projectileY, PROJECTILE_WIDTH, PROJECTILE_HEIGHT);
@@ -359,6 +369,7 @@ public class SpaceGame extends JFrame implements KeyListener {
                 }
 
             }
+
 
 
 
